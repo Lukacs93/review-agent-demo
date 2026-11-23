@@ -8,7 +8,9 @@ namespace Orders.Api.Controllers;
 public sealed class OrdersController(
     PlaceOrderHandler placeOrder,
     GetOrderHandler getOrder,
-    CancelOrderHandler cancelOrder) : ControllerBase
+    CancelOrderHandler cancelOrder,
+    PayOrderHandler payOrder,
+    GetPickListHandler getPickList) : ControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> Place(PlaceOrderCommand command, CancellationToken cancellationToken)
@@ -30,4 +32,15 @@ public sealed class OrdersController(
         var found = await cancelOrder.HandleAsync(new CancelOrderCommand(id), cancellationToken);
         return found ? NoContent() : NotFound();
     }
+
+    [HttpPost("{id:guid}/pay")]
+    public async Task<IActionResult> Pay(Guid id, PayOrderCommand command, CancellationToken cancellationToken)
+    {
+        var paymentId = await payOrder.HandleAsync(command with { OrderId = id }, cancellationToken);
+        return paymentId is null ? NotFound() : Ok(new { paymentId });
+    }
+
+    [HttpGet("pick-list")]
+    public async Task<IActionResult> PickList(CancellationToken cancellationToken) =>
+        Ok(await getPickList.HandleAsync(new GetPickListQuery(), cancellationToken));
 }
