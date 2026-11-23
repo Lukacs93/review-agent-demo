@@ -13,6 +13,8 @@ builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<PlaceOrderHandler>();
 builder.Services.AddScoped<GetOrderHandler>();
 builder.Services.AddScoped<CancelOrderHandler>();
+builder.Services.AddScoped<PayOrderHandler>();
+builder.Services.AddScoped<GetPickListHandler>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton<ICustomerTiers, CustomerTiers>();
 

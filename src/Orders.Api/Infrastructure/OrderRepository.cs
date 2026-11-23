@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Orders.Api.Application;
 using Orders.Api.Domain;
 
@@ -10,6 +11,9 @@ public sealed class OrderRepository(OrdersDbContext db) : IOrderRepository
 
     public async Task<Order?> GetAsync(Guid id, CancellationToken cancellationToken) =>
         await db.Orders.FindAsync([id], cancellationToken);
+
+    public async Task<IReadOnlyList<Order>> ListAsync(CancellationToken cancellationToken) =>
+        await db.Orders.AsNoTracking().ToListAsync(cancellationToken);
 
     public Task SaveChangesAsync(CancellationToken cancellationToken) =>
         db.SaveChangesAsync(cancellationToken);
