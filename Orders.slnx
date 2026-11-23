@@ -7,9 +7,6 @@
   <Folder Name="/.review/">
     <File Path=".review/rules.md" />
   </Folder>
-  <Folder Name="/.review/templates/">
-    <File Path=".review/templates/OrderPriority.cs" />
-  </Folder>
   <Folder Name="/src/">
     <Project Path="src/Orders.Api/Orders.Api.csproj" />
   </Folder>
