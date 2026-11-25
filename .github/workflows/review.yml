@@ -18,7 +18,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  review:
+  # The checks are named after this job and the reusable workflow's jobs: "review-agent / Review" and
+  # "review-agent / Publish".
+  review-agent:
     # A pull request from a fork gets no secrets, so it cannot be reviewed; drafts are reviewed when ready.
     if: >-
       github.event_name == 'workflow_dispatch'
