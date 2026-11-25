@@ -1,0 +1,33 @@
+# Reviews every pull request with review-agent. The review is in the run's summary; it is published on the pull
+# request only after a reviewer of the review-publishing environment approves the publish job.
+name: Review agent
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+    inputs:
+      pull-request-number:
+        description: The pull request to review.
+        required: true
+        type: number
+
+# A newer push to the same pull request makes a running review out of date.
+concurrency:
+  group: review-agent-${{ github.event.pull_request.number || inputs.pull-request-number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    # A pull request from a fork gets no secrets, so it cannot be reviewed; drafts are reviewed when ready.
+    if: >-
+      github.event_name == 'workflow_dispatch'
+      || (github.event.pull_request.head.repo.full_name == github.repository && !github.event.pull_request.draft)
+    uses: Lukacs93/review-agent/.github/workflows/review-pull-request.yml@main
+    permissions:
+      contents: read
+      pull-requests: write
+    with:
+      pull-request-number: ${{ github.event.pull_request.number || inputs.pull-request-number }}
+    secrets:
+      model-api-key: ${{ secrets.REVIEW_AGENT_MODEL_API_KEY }}
