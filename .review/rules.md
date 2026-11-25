@@ -77,9 +77,27 @@ The full card number is never stored or passed on: only the `PaymentToken` is.
 
 ### BIZ-01 – Business cases follow their template (error)
 
-Some business cases have a template in `.review/templates/`. Code for such a case must behave as its template
-does; it may be written differently.
+Some business cases have a template below. Code for such a case must behave as its template does; it may be
+written differently.
 
-| Case | Template |
-| --- | --- |
-| the order the warehouse handles orders in | `.review/templates/OrderPriority.cs` |
+**The order the warehouse handles orders in:**
+
+```csharp
+using Orders.Api.Application;
+using Orders.Api.Domain;
+
+namespace Orders.Api.Templates;
+
+public static class OrderPriority
+{
+    /// <summary>
+    /// Placed orders only (cancelled and shipped ones are left out); priority customers' orders first; within
+    /// each group, the oldest order first.
+    /// </summary>
+    public static IEnumerable<Order> InWarehouseOrder(IEnumerable<Order> orders, ICustomerTiers tiers) =>
+        orders
+            .Where(order => order.Status == OrderStatus.Placed)
+            .OrderByDescending(order => tiers.IsPriority(order.CustomerId))
+            .ThenBy(order => order.PlacedAt);
+}
+```
