@@ -9,6 +9,8 @@ public sealed class Order
     public Guid CustomerId { get; private set; }
     public OrderStatus Status { get; private set; }
     public DateTimeOffset PlacedAt { get; private set; }
+    public DateTimeOffset? ShippedAt { get; private set; }
+    public decimal DiscountAmount { get; set; }
     public IReadOnlyList<OrderLine> Lines => _lines;
 
     public decimal Total => _lines.Sum(line => line.LineTotal);
@@ -43,5 +45,16 @@ public sealed class Order
         }
 
         Status = OrderStatus.Cancelled;
+    }
+
+    public void MarkAsShipped(DateTimeOffset now)
+    {
+        if (Status != OrderStatus.Placed)
+        {
+            throw new DomainException("Only a placed order can be shipped.");
+        }
+
+        Status = OrderStatus.Shipped;
+        ShippedAt = now;
     }
 }
