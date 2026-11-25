@@ -30,6 +30,10 @@ jobs:
       contents: read
       pull-requests: write
     with:
-      pull-request-number: ${{ github.event.pull_request.number || inputs.pull-request-number }}
+      # A manual run's number input arrives as text, which a number input of the called workflow does not take.
+      pull-request-number: >-
+        ${{ github.event_name == 'workflow_dispatch'
+        && fromJSON(inputs.pull-request-number)
+        || github.event.pull_request.number }}
     secrets:
       model-api-key: ${{ secrets.REVIEW_AGENT_MODEL_API_KEY }}
